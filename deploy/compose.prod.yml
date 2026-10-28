@@ -1,0 +1,26 @@
+# Продакшен-состав на VPS Hetzner (ADR-0004). Копируется на сервер workflow `image` при деплое.
+# API публикуется только на 127.0.0.1: снаружи сервиса нет, пока не появится обратный прокси с аутентификацией (T6.1).
+name: raffle-exchange
+
+services:
+  exchange-api:
+    image: ghcr.io/raffle-market-2025/raffle-exchange-api:${IMAGE_TAG:?IMAGE_TAG is required}
+    restart: unless-stopped
+    environment:
+      LOG_LEVEL: info
+    ports:
+      - "127.0.0.1:3100:3100"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 512m
+    pids_limit: 256
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"

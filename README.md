@@ -48,9 +48,7 @@ pnpm run check:trace # покрытие требований до текущег
 
 ## Образ и развёртывание
 
-`apps/exchange-api/Dockerfile` собирает образ API (`docker compose --profile api up --build`). Workflow `image` на каждый push и pull request собирает образ, запускает его и проверяет `/health/live` и то, что процесс работает не от root; на `main` публикует образ в GHCR с тегами `main` и SHA коммита.
-
-Шага развёртывания на сервер пока нет: хост не выбран ([ADR-0004](docs/adr/0004-hosting.md)). Он добавляется вместе с выбором хоста; ключи доступа хранятся в секретах окружения GitHub.
+`apps/exchange-api/Dockerfile` собирает образ API (`docker compose --profile api up --build`). Workflow `image` на каждый push и pull request собирает образ, запускает его и проверяет `/health/live` и то, что процесс работает не от root; на `main` публикует образ в GHCR с тегами `main` и SHA коммита и, если включено, деплоит на VPS Hetzner с подтверждением, проверкой здоровья и откатом. Настройка — [deploy/README.md](deploy/README.md), решение — [ADR-0004](docs/adr/0004-hosting.md).
 
 ## Правила, которые проверяются автоматически
 

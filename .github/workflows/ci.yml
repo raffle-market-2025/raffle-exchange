@@ -26,6 +26,12 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Workflow и shell-скрипты деплоя
+        run: |
+          curl -sSfL -o /tmp/actionlint.tgz https://github.com/rhysd/actionlint/releases/download/v1.7.7/actionlint_1.7.7_linux_amd64.tar.gz
+          tar -xzf /tmp/actionlint.tgz -C /tmp actionlint
+          /tmp/actionlint
+          shellcheck deploy/*.sh
       - name: Запрещённые файлы (сессии, профили, трейсы)
         run: pnpm run check:forbidden
       # Сборка до линтера: type-aware правила читают типы пакетов из dist.

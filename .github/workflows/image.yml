@@ -1,7 +1,8 @@
 name: image
 
-# Сборка и проверка образа exchange-api; на main — публикация в GHCR.
-# Шага развёртывания нет, пока не выбран хост (ADR-0004): его добавят вместе с секретами окружения.
+# Сборка и проверка образа exchange-api; на main — публикация в GHCR и деплой на VPS Hetzner (ADR-0004).
+# Деплой включается переменной репозитория DEPLOY_ENABLED=true и идёт через GitHub Environment `production`
+# с обязательным подтверждением. Настройка — deploy/README.md.
 on:
   push:
     branches: [main]
@@ -31,7 +32,7 @@ jobs:
       - name: Смоук-тест контейнера
         run: |
           docker run -d --name api -p 127.0.0.1:3100:3100 "$IMAGE:${GITHUB_SHA}"
-          for i in $(seq 1 30); do
+          for _ in $(seq 1 30); do
             if curl -fsS http://127.0.0.1:3100/health/live; then echo; break; fi
             sleep 1
           done
@@ -46,3 +47,42 @@ jobs:
           docker tag "$IMAGE:${GITHUB_SHA}" "$IMAGE:main"
           docker push "$IMAGE:${GITHUB_SHA}"
           docker push "$IMAGE:main"
+
+  deploy:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    environment:
+      name: production
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    permissions:
+      contents: read
+    env:
+      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ключ и known_hosts
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          test -n "$DEPLOY_HOST" && test -n "$DEPLOY_USER" && test -n "$DEPLOY_SSH_KEY" && test -n "$DEPLOY_KNOWN_HOSTS"
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+      - name: Копирование состава и скрипта
+        run: |
+          scp -o BatchMode=yes -o StrictHostKeyChecking=yes -i ~/.ssh/deploy_key \
+            deploy/compose.prod.yml deploy/remote-deploy.sh "$DEPLOY_USER@$DEPLOY_HOST:/opt/raffle-exchange/"
+      - name: Деплой с проверкой здоровья и откатом
+        run: |
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -i ~/.ssh/deploy_key \
+            "$DEPLOY_USER@$DEPLOY_HOST" "bash /opt/raffle-exchange/remote-deploy.sh $GITHUB_SHA"
+      - name: Удаление ключа с раннера
+        if: always()
+        run: rm -f ~/.ssh/deploy_key
