@@ -1,0 +1,12 @@
+{
+  "name": "@raffle-exchange/walt-browser-worker",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Браузерный исполнитель Walt. Этап C: пишется только после карты экранов этапа A.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests"
+  }
+}

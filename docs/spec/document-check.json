@@ -1,0 +1,78 @@
+{
+  "date": "2026-10-28",
+  "version": "1.3",
+  "scope": "specification consistency and requirement traceability only",
+  "markdownFiles": 11,
+  "currentNormativeVersion": "1.3",
+  "historicalReport": "09-audit-v1.2.md",
+  "words": 18737,
+  "brokenLocalLinks": [],
+  "incorrectCurrentVersions": [],
+  "uniqueAcceptanceScenarioCount": 148,
+  "executionInvariantCount": 44,
+  "invariantsWithMatchingXScenarios": 44,
+  "correctedFindingGroupsThisPass": 12,
+  "documentRegressionChecks": {
+    "no_per_restart_historical_baseline": true,
+    "no_old_delivery_key": true,
+    "outgoing_receipt_contract": true,
+    "native_scenarios_primary": true,
+    "historical_report_preserved": true
+  },
+  "runtimeTestsExecuted": false,
+  "financialActionsExecuted": false,
+  "codeOrAccountChanges": false,
+  "remainingExternalValidation": [
+    "actual Walt and Oschad UI and session constraints",
+    "bank evidence sufficient for payment and counterparty matching",
+    "push collector access and actual receipt workflow",
+    "verified own promo channel linkage and consent",
+    "fees, limits, timing and separately authorized live acceptance"
+  ],
+  "files": [
+    {
+      "path": "01-product-spec.md",
+      "sha256": "25d2976b908184e9d3a663eb84084cd590b78796bdbc206e9bf8496c9ed501e6"
+    },
+    {
+      "path": "02-technical-spec.md",
+      "sha256": "72c5d49629b36e960b8ade0ee9910e3100968c12e85cebdfcf7f67d02c281317"
+    },
+    {
+      "path": "03-promo-acquisition-spec.md",
+      "sha256": "1e0a3a508d161b1fe13578c658d7a2624be3ad65e6983dfe09a235c0b543377f"
+    },
+    {
+      "path": "04-acceptance-and-audit.md",
+      "sha256": "db75294ac98d81f05c51da8ba91f5e62dc7d9f40d8e8d7b66834903b8d081338"
+    },
+    {
+      "path": "05-provider-capabilities.md",
+      "sha256": "3b6e3af73564acb346d2af452eba15e62c613a68bf072858ae83f351da335dd2"
+    },
+    {
+      "path": "06-oschad-web-spec.md",
+      "sha256": "0d789d5ca14c8582f07bcb0723b76ef913ce1c556ea4a474803ae1465c7ec26d"
+    },
+    {
+      "path": "07-walt-web-spec.md",
+      "sha256": "900eb0fe1aadbf3f363023533d915e824524c812b3f03053bdbc4d466d42be13"
+    },
+    {
+      "path": "08-execution-contract.md",
+      "sha256": "aa02751693555fbc66f861880ff94741f1305d869a521026aa4366a86ac53299"
+    },
+    {
+      "path": "09-audit-v1.2.md",
+      "sha256": "3fe3eff1126b85745ac96835382bc4920df003976ae5f88a0116cee9a0e2e4e0"
+    },
+    {
+      "path": "10-audit-v1.3.md",
+      "sha256": "532a5f86aa17e7b93de0b2862e1939de163d66b3f6510687a7f6d54fe5481ab5"
+    },
+    {
+      "path": "README.md",
+      "sha256": "80f1cf6af9f5ddd023356e8ab324e836c8ac99f88129edcfe9729934f9d8ae78"
+    }
+  ]
+}

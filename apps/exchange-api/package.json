@@ -1,0 +1,30 @@
+{
+  "name": "@raffle-exchange/exchange-api",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Внутренний API обмена: админка, приём сигналов сборщика push, позже OWN_UI (трек 6).",
+  "main": "dist/main.js",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "start": "node dist/main.js"
+  },
+  "dependencies": {
+    "@nestjs/common": "11.2.7",
+    "@nestjs/core": "11.2.7",
+    "@nestjs/platform-express": "11.2.7",
+    "@raffle-exchange/core": "workspace:*",
+    "reflect-metadata": "0.2.2",
+    "rxjs": "7.8.2"
+  },
+  "devDependencies": {
+    "@nestjs/testing": "11.2.7",
+    "@swc/core": "1.16.18",
+    "@types/express": "5.0.6",
+    "@types/supertest": "7.2.1",
+    "supertest": "7.3.1",
+    "unplugin-swc": "2.0.0"
+  }
+}

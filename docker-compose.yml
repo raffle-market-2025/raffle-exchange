@@ -1,0 +1,49 @@
+# Локальная среда. Отдельный Postgres обмена на порту 5433, чтобы не пересекаться
+# с базами розыгрышей на 5432 (EX-039, ADR-0001).
+services:
+  exchange-db:
+    image: postgres:16.4-alpine
+    container_name: raffle-exchange-db
+    environment:
+      POSTGRES_DB: raffle_exchange
+      POSTGRES_USER: exchange
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-exchange_local}
+      TZ: UTC
+      PGTZ: UTC
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - exchange-db-data:/var/lib/postgresql/data
+    # Скрипт инициализации передаётся как config, а не bind-mount каталога:
+    # так он не зависит от прав каталогов на хосте (в Codespaces umask даёт 754, и postgres его не читает).
+    configs:
+      - source: exchange-db-init
+        target: /docker-entrypoint-initdb.d/01-schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U exchange -d raffle_exchange"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # Каркас API в контейнере: docker compose --profile api up --build
+  exchange-api:
+    profiles: ["api"]
+    build:
+      context: .
+      dockerfile: apps/exchange-api/Dockerfile
+    container_name: raffle-exchange-api
+    environment:
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    ports:
+      - "127.0.0.1:3100:3100"
+
+configs:
+  exchange-db-init:
+    content: |
+      -- Схема exchange внутри отдельной БД обмена (ADR-0001, 02 §10).
+      CREATE SCHEMA IF NOT EXISTS exchange AUTHORIZATION exchange;
+      ALTER ROLE exchange SET search_path TO exchange, public;
+      ALTER DATABASE raffle_exchange SET timezone TO 'UTC';
+
+volumes:
+  exchange-db-data:

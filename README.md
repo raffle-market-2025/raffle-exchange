@@ -1,2 +1,65 @@
 # raffle-exchange
-USDT-UAH exchange service for Raffle Market: ledger, order states, execution, reconciliation.
+
+Сервис обмена USDT ↔ UAH для Raffle Market: учёт, состояния сделок, исполнение через браузерных исполнителей Walt и Ощада, сверка и восстановление. Отдельная БД и секреты, без связи с кошельками и контрактами розыгрышей (EX-039).
+
+**Статус: этап B, гейт G0 пройден.** Реальных аккаунтов, сессий и денег здесь нет. Браузерные исполнители пишутся только после обследования интерфейсов (этап A).
+
+## Документы
+
+- [ТЗ v1.3](docs/spec/README.md) — нормативная база; при расхождении приоритет у [контракта 08](docs/spec/08-execution-contract.md).
+- [План этапа B](docs/stage-b-plan.md) — треки, задачи, гейты.
+- [Матрица трассировки](docs/traceability.md) — требование → задача → тест.
+- [ADR](docs/adr/README.md) — БД, очередь, стек, хостинг.
+- [Аудиты гейтов](docs/audits/).
+
+## Структура
+
+```
+apps/
+  exchange-api/            внутренний API (NestJS): админка, приём push, позже OWN_UI
+  exchange-worker/         outbox, lease, попытки, сверка (трек 3)
+  walt-browser-worker/     этап C, после карты экранов
+  oschad-browser-worker/   этап C, после обследования кабинета
+  push-collector-android/  сборщик push на выделенном Android (T5.6)
+packages/
+  core/                    Money, Clock, ID, коды ошибок, логи с редактированием
+  exchange-domain/         состояния и инварианты сделки (трек 1)
+  exchange-ledger/         двойная запись и ликвидность (трек 2)
+  walt-adapter/            контракт Walt, реестр возможностей, рыночный API (трек 4)
+  fiat-adapter/            контракт Ощада и банковские доказательства (треки 4–5)
+  testkit/                 FakeWalt, FakeOschad, fault injection
+  db/                      схема Prisma и миграции (модели — к G1)
+docs/                      ТЗ, план, ADR, трассировка, аудиты
+scripts/                   проверки трассировки и запрещённых файлов
+```
+
+## Команды
+
+```bash
+corepack enable && corepack prepare pnpm@10.34.9 --activate   # или npm i -g pnpm@10.34.9
+pnpm install
+docker compose up -d exchange-db   # Postgres обмена на 127.0.0.1:5433
+cp .env.example .env
+
+pnpm run ci          # всё, что проверяет CI
+pnpm test            # тесты всех пакетов
+pnpm run check:trace # покрытие требований до текущего гейта
+```
+
+## Образ и развёртывание
+
+`apps/exchange-api/Dockerfile` собирает образ API (`docker compose --profile api up --build`). Workflow `image` на каждый push и pull request собирает образ, запускает его и проверяет `/health/live` и то, что процесс работает не от root; на `main` публикует образ в GHCR с тегами `main` и SHA коммита.
+
+Шага развёртывания на сервер пока нет: хост не выбран ([ADR-0004](docs/adr/0004-hosting.md)). Он добавляется вместе с выбором хоста; ключи доступа хранятся в секретах окружения GitHub.
+
+## Правила, которые проверяются автоматически
+
+- Деньги только через `Money`; в доменном коде линтер запрещает `Number()`, `parseFloat`, `Math.round`, `toFixed`.
+- Время только через `Clock`; `Date.now()` и `new Date()` без аргументов запрещены там же.
+- Логи проходят редактирование: ключи, cookies, OTP, номера карт и IBAN не выводятся.
+- В коммит не попадают `.env`, профили браузера, storage state, HAR, трейсы, скриншоты и ключи.
+- Для каждого требования, чей гейт наступил, есть тест с меткой `[ID]`.
+
+## Публичность
+
+Репозиторий временно публичный. До кода, связанного с реальными экранами, и до этапа C его нужно сделать приватным — причины в [плане этапа B](docs/stage-b-plan.md#публичность-репозитория).

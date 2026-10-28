@@ -1,0 +1,15 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# Защита цепочки поставки: версии моложе 14 дней не ставятся (в минутах).
+minimumReleaseAge: 20160
+
+# pnpm 10 по умолчанию не запускает lifecycle-скрипты зависимостей.
+# Разрешены только те, без которых пакет не работает.
+onlyBuiltDependencies:
+  - "@swc/core"
+  - "esbuild"
+  - "prisma"
+  - "@prisma/engines"
+  - "@prisma/client"

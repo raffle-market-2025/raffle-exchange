@@ -1,0 +1,14 @@
+{
+  "name": "@raffle-exchange/walt-adapter",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Контракт Walt-адаптера (07 §3), реестр возможностей, клиент рыночного API (трек 4).",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests"
+  }
+}

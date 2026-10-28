@@ -1,0 +1,39 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Запрещённые файлы (сессии, профили, трейсы)
+        run: pnpm run check:forbidden
+      # Сборка до линтера: type-aware правила читают типы пакетов из dist.
+      - run: pnpm run build
+      - run: pnpm run lint
+      - run: pnpm run typecheck
+      - run: pnpm run test
+      - name: Схема Prisma
+        run: pnpm run db:validate
+      - name: Трассировка требований (гейт из docs/current-gate)
+        run: pnpm run check:trace

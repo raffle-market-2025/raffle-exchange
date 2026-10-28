@@ -1,0 +1,48 @@
+name: image
+
+# Сборка и проверка образа exchange-api; на main — публикация в GHCR.
+# Шага развёртывания нет, пока не выбран хост (ADR-0004): его добавят вместе с секретами окружения.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: image-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  IMAGE: ghcr.io/${{ github.repository_owner }}/raffle-exchange-api
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Сборка образа
+        run: docker build -f apps/exchange-api/Dockerfile -t "$IMAGE:${GITHUB_SHA}" .
+      - name: Смоук-тест контейнера
+        run: |
+          docker run -d --name api -p 127.0.0.1:3100:3100 "$IMAGE:${GITHUB_SHA}"
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:3100/health/live; then echo; break; fi
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:3100/health/live | grep -q '"live":true'
+          test "$(docker inspect -f '{{.Config.User}}' api)" = "node"
+          docker logs api
+          docker rm -f api
+      - name: Публикация в GHCR (только main)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker tag "$IMAGE:${GITHUB_SHA}" "$IMAGE:main"
+          docker push "$IMAGE:${GITHUB_SHA}"
+          docker push "$IMAGE:main"

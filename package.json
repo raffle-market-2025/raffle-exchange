@@ -1,0 +1,28 @@
+{
+  "name": "raffle-exchange",
+  "private": true,
+  "description": "Обмен USDT ↔ UAH для Raffle Market: домен, учёт, исполнение и сверка. ТЗ v1.3 в docs/spec.",
+  "packageManager": "pnpm@10.34.9",
+  "engines": {
+    "node": ">=22.12 <23"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "lint": "eslint . --max-warnings=0",
+    "check:trace": "node scripts/check-traceability.mjs",
+    "check:forbidden": "node scripts/check-forbidden-files.mjs",
+    "db:validate": "pnpm --filter @raffle-exchange/db run validate",
+    "ci": "pnpm run check:forbidden && pnpm run build && pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run db:validate && pnpm run check:trace"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.5",
+    "@types/node": "22.20.5",
+    "eslint": "9.39.5",
+    "turbo": "2.11.8",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.71.2",
+    "vitest": "3.2.7"
+  }
+}

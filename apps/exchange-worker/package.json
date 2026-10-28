@@ -1,0 +1,12 @@
+{
+  "name": "@raffle-exchange/exchange-worker",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Исполнение: outbox, lease, попытки, аварийная остановка, сверка и восстановление (трек 3).",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests"
+  }
+}

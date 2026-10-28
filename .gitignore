@@ -1,0 +1,35 @@
+# зависимости и сборка
+node_modules/
+dist/
+coverage/
+.turbo/
+*.tsbuildinfo
+
+# окружение — реальные значения никогда не коммитятся
+.env
+.env.*
+!.env.example
+
+# браузерные профили, сессии и артефакты обследования (этап A) — только вне git
+profiles/
+**/browser-profiles/
+**/storage-state*.json
+*.har
+**/traces/
+trace*.zip
+**/screenshots/
+**/stage-a/
+
+# Android
+apps/push-collector-android/.gradle/
+apps/push-collector-android/build/
+apps/push-collector-android/app/build/
+apps/push-collector-android/local.properties
+*.keystore
+*.jks
+
+# ОС и редакторы
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json

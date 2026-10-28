@@ -1,0 +1,14 @@
+{
+  "name": "@raffle-exchange/testkit",
+  "version": "0.0.0",
+  "private": true,
+  "description": "FakeWalt, FakeOschad, стенд fault injection и сценарии приёмки (трек 4, T3.9).",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests"
+  }
+}

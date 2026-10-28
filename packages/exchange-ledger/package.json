@@ -1,0 +1,14 @@
+{
+  "name": "@raffle-exchange/exchange-ledger",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Двойная запись по UAH и USDT, резервы, внешние блокировки, ликвидность объявлений (трек 2).",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests"
+  }
+}
